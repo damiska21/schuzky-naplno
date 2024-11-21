@@ -65,9 +65,14 @@ Container(
         ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () {
+          onPressed: () async {
             //addProgram();
-            Navigator.of(context).pushNamed("/editProgram");
+            final cont = await Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const AddProgramScreen()),);
+            setState(() {
+              programy.add(cont);
+            });
+            print(cont);
           },
         ),
       ),
