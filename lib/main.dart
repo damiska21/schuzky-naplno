@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'pages/programScreen.dart';
 void main() {
   runApp( 
-    new MaterialApp(
-    home: MyApp(),
+    MaterialApp(
+    home: const MyApp(),
     routes: <String, WidgetBuilder>{
-      "/editProgram" : (BuildContext context)=> AddProgramScreen(),
+      "/editProgram" : (BuildContext context)=> const AddProgramScreen(),
       //add more routes here
     },
 ));
@@ -19,37 +19,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   List<Container> programy = [];
-  void addProgram(){
-    setState(() {
-      programy.add(
-Container(
-  decoration: BoxDecoration(
-    color: Colors.blue,
-    borderRadius: BorderRadius.circular(10),
-  ),
-  child: const Row(
-    children: [
-      Spacer(),
-      Column(
-        children: [
-          Text('sloupec 1'),
-          Text('sloupec 1')
-        ],
-      ),
-      Spacer(flex: 2,),
-      Column(
-        children: [
-          Text('sloupec 2'),
-          Text('sloupec 2')
-        ],
-      ),
-      Spacer()
-    ],
-  )
-)
-      );
-    });
-  }
   @override
   //build se volá vždycky když rebilduješ appku
   Widget build(BuildContext context) {
@@ -72,7 +41,8 @@ Container(
             setState(() {
               programy.add(cont);
             });
-            print(cont);
+            //print(cont);
+            //print(programy);
           },
         ),
       ),

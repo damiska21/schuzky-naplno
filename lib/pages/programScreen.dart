@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -15,6 +13,7 @@ class _AddProgramScreenState extends State<AddProgramScreen> {
   final popisController = TextEditingController();
   final timeController = TextEditingController();
 
+
   @override // Clean up the controller when the widget is disposed.
   void dispose() {
     nadpisController.dispose();
@@ -25,13 +24,15 @@ class _AddProgramScreenState extends State<AddProgramScreen> {
 
   @override
   Widget build(BuildContext context) {
+  //double screenWidth = MediaQuery.of(context).size.width;
+  //double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
           title: const Text('Tvorba programu'),
       ),
       body:  Column(
-         children:  [
+         children:  [ //containry na textový pole
            Container(
             margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
             child: TextField(
@@ -69,29 +70,54 @@ class _AddProgramScreenState extends State<AddProgramScreen> {
             Navigator.pop(context, 
 
 Container(
+  width: double.infinity, // Ensure it takes full width
+  constraints: const BoxConstraints(minHeight: 50), // Minimum height to avoid errors
   decoration: BoxDecoration(
     color: Colors.blue,
     borderRadius: BorderRadius.circular(10),
   ),
-  child: Row(
-    children: [
-      Spacer(),
-      Column(
-        children: [
-          Text(nadpisController.text),
-          Flexible(child: Text(popisController.text))
-        ],
-      ),
-      Spacer(flex: 2,),
-      Column(
-        children: [
-          Text('čas: ${timeController.text} minut')
-        ],
-      ),
-      Spacer()
-    ],
-  )
+margin: EdgeInsets.all(8),
+  child: Padding(
+    padding: const EdgeInsets.all(8.0), // Padding for better spacing
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start, // Align content to top
+      children: [
+        const Spacer(),
+        Expanded( // Ensures text wraps properly inside row
+          flex: 3, // Adjust flex value to balance layout
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, // Align text to start
+            children: [
+              Text(
+                nadpisController.text,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4), // Add spacing
+              Text(
+                popisController.text,
+                softWrap: true, // Ensures wrapping
+                overflow: TextOverflow.visible, // Ensures text doesn't get clipped
+              ),
+            ],
+          ),
+        ),
+        const Spacer(flex: 2),
+        Expanded( // Prevents layout breaking due to long text
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${timeController.text} minut',
+              ),
+            ],
+          ),
+        ),
+        const Spacer(),
+      ],
+    ),
+  ),
 ))
+
 
            }, 
             child: Container(
