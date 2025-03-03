@@ -13,6 +13,16 @@ class _AddProgramScreenState extends State<AddProgramScreen> {
   final popisController = TextEditingController();
   final timeController = TextEditingController();
 
+String getMinuteLabel(String text) {
+  int? minutes = int.tryParse(text); // Convert text to int safely
+  if (minutes == 1) {
+    return "minuta";
+  } else if (minutes != null && minutes >= 2 && minutes <= 4) {
+    return "minuty";
+  } else {
+    return "minut";
+  }
+}
 
   @override // Clean up the controller when the widget is disposed.
   void dispose() {
@@ -84,7 +94,7 @@ margin: const EdgeInsets.all(8),
       children: [
         const Spacer(),
         Expanded( // Ensures text wraps properly inside row
-          flex: 3, // Adjust flex value to balance layout
+          flex: 2, // Adjust flex value to balance layout
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start, // Align text to start
             children: [
@@ -98,21 +108,14 @@ margin: const EdgeInsets.all(8),
                 softWrap: true, // Ensures wrapping
                 overflow: TextOverflow.visible, // Ensures text doesn't get clipped
               ),
-            ],
-          ),
-        ),
-        const Spacer(flex: 2),
-        Expanded( // Prevents layout breaking due to long text
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
               Text(
-                '${timeController.text} minut',
-              ),
+                "${timeController.text} ${getMinuteLabel(timeController.text)}",
+                softWrap: true, // Ensures wrapping
+                overflow: TextOverflow.visible, // Ensures text doesn't get clipped
+              )
             ],
           ),
         ),
-        const Spacer(),
       ],
     ),
   ),

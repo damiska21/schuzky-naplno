@@ -29,10 +29,10 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.blue,
-          title: const Text('Schůzky naplno!'),
+          title: const Text('Plánovač schůzek'),
         ),
         body: programy.isEmpty
-            ? const Center(child: Text("Žádné programy"))
+            ? const Center(child: Text("Žádné programy. Přidej jeden tlačítkem vpravo dole!"))
             : ReorderableListView(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 children: [
