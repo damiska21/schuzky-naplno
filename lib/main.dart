@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
 import 'pages/programScreen.dart';
+
 void main() {
-  runApp( 
+  runApp(
     MaterialApp(
-    home: const MyApp(),
-    routes: <String, WidgetBuilder>{
-      "/editProgram" : (BuildContext context)=> const AddProgramScreen(),
-      //add more routes here
-    },
-));
+      home: const MyApp(),
+      routes: <String, WidgetBuilder>{
+        "/editProgram": (BuildContext context) => const AddProgramScreen(),
+      },
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   List<Container> programy = [];
+
   @override
-  //build se volá vždycky když rebilduješ appku
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -29,20 +31,51 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.blue,
           title: const Text('Schůzky naplno!'),
         ),
-        body: Column(
-          children: programy,
-        ),
+        body: programy.isEmpty
+            ? const Center(child: Text("Žádné programy"))
+            : ReorderableListView(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                children: [
+                  for (int index = 0; index < programy.length; index++)
+                    ListTile(
+                      key: ValueKey(index),
+                      title: programy[index],
+                      leading: ReorderableDragStartListener(
+                        index: index,
+                        child: const Icon(Icons.drag_handle),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          setState(() {
+                            programy.removeAt(index);
+                          });
+                        },
+                      ),
+                    ),
+                ],
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) {
+                      newIndex -= 1;
+                    }
+                    final item = programy.removeAt(oldIndex);
+                    programy.insert(newIndex, item);
+                  });
+                },
+              ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () async {
-            //addProgram();
-            final cont = await Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const AddProgramScreen()),);
-            setState(() {
-              programy.add(cont);
-            });
-            //print(cont);
-            //print(programy);
+            final cont = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddProgramScreen()),
+            );
+            if (cont != null && cont is Container) {
+              setState(() {
+                programy.add(cont);
+              });
+            }
           },
         ),
       ),

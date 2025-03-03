@@ -76,7 +76,7 @@ Container(
     color: Colors.blue,
     borderRadius: BorderRadius.circular(10),
   ),
-margin: EdgeInsets.all(8),
+margin: const EdgeInsets.all(8),
   child: Padding(
     padding: const EdgeInsets.all(8.0), // Padding for better spacing
     child: Row(
