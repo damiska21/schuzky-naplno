@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:schuzky_naplno/pages/programItem.dart';
 
 class AddProgramScreen extends StatefulWidget {
-  const AddProgramScreen({super.key});
+  final ProgramItem program;
+  const AddProgramScreen({super.key, required this.program});
 
   @override
   State<AddProgramScreen> createState() => _AddProgramScreenState();
 }
 
 class _AddProgramScreenState extends State<AddProgramScreen> {
-  final nadpisController = TextEditingController();
-  final popisController = TextEditingController();
-  final timeController = TextEditingController();
+  late TextEditingController nadpisController;
+  late TextEditingController popisController;
+  late TextEditingController timeController;
 
-String getMinuteLabel(String text) {
-  int? minutes = int.tryParse(text); // Convert text to int safely
-  if (minutes == 1) {
-    return "minuta";
-  } else if (minutes != null && minutes >= 2 && minutes <= 4) {
-    return "minuty";
-  } else {
-    return "minut";
+  @override
+  void initState() {
+    super.initState();
+    // Properly initialize the controllers with existing text values
+    nadpisController = TextEditingController(text: widget.program.nadpisController.text);
+    popisController = TextEditingController(text: widget.program.popisController.text);
+    timeController = TextEditingController(text: widget.program.timeController.text);
   }
-}
-
   @override // Clean up the controller when the widget is disposed.
   void dispose() {
     nadpisController.dispose();
@@ -77,55 +76,9 @@ String getMinuteLabel(String text) {
                 border: OutlineInputBorder(),),),
            ),
            ElevatedButton(onPressed: () =>{
-            Navigator.pop(context, 
-
-Container(
-  width: double.infinity, // Ensure it takes full width
-  constraints: const BoxConstraints(minHeight: 50), // Minimum height to avoid errors
-  decoration: BoxDecoration(
-    color: Colors.blue,
-    borderRadius: BorderRadius.circular(10),
-  ),
-margin: const EdgeInsets.all(8),
-  child: Padding(
-    padding: const EdgeInsets.all(8.0), // Padding for better spacing
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start, // Align content to top
-      children: [
-        const Spacer(),
-        Expanded( // Ensures text wraps properly inside row
-          flex: 2, // Adjust flex value to balance layout
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // Align text to start
-            children: [
-              Text(
-                nadpisController.text,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4), // Add spacing
-              Text(
-                popisController.text,
-                softWrap: true, // Ensures wrapping
-                overflow: TextOverflow.visible, // Ensures text doesn't get clipped
-              ),
-              Text(
-                "${timeController.text} ${getMinuteLabel(timeController.text)}",
-                softWrap: true, // Ensures wrapping
-                overflow: TextOverflow.visible, // Ensures text doesn't get clipped
-              )
-            ],
-          ),
-        ),
-      ],
-    ),
-  ),
-))
-
-
-           }, 
+            Navigator.pop(context, ProgramItem(nadpis: nadpisController.text, popis: popisController.text, time: timeController.text))}, 
             child: Container(
              margin: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
-
              decoration: const BoxDecoration(
                color:  Color.fromARGB(255, 0, 0, 0),
              ),
@@ -135,4 +88,15 @@ margin: const EdgeInsets.all(8),
       ),
     );
   }
+
+  String getMinuteLabel(String text) {
+  int? minutes = int.tryParse(text); // Convert text to int safely
+  if (minutes == 1) {
+    return "minuta";
+  } else if (minutes != null && minutes >= 2 && minutes <= 4) {
+    return "minuty";
+  } else {
+    return "minut";
+  }
+}
 }

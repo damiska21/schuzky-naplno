@@ -3,14 +3,15 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'pages/programScreen.dart';
+import 'pages/edit.dart';
+import 'package:schuzky_naplno/pages/programItem.dart';
 
 void main() {
   runApp(
     MaterialApp(
       home:  MyApp(storage: Storage()),
       routes: <String, WidgetBuilder>{
-        "/editProgram": (BuildContext context) => const AddProgramScreen(),
+        "/edit": (BuildContext context) => const EditScreen(programyInput: [],),
       },
     ),
   );
@@ -46,34 +47,73 @@ class MyApp extends StatefulWidget {
 
 
 class _MyAppState extends State<MyApp> {
-  List<Container> programy = [];
+  List<ProgramItem> programy = [];
 
   Future<File> _saveProgramy() {
-    return widget.storage.write(serializeContainers(programy));
+    return widget.storage.write(serializeProgramItems(programy));
   }
 
-String serializeContainers(List<Container> containers) {
-  List<Map<String, String>> containerData = [];
+String serializeProgramItems(List<ProgramItem> items) {
+  List<Map<String, String>> serializedData = items.map((item) {
+    return {
+      "title": item.nadpisController.text,
+      "description": item.popisController.text,
+      "time": item.timeController.text,
+    };
+  }).toList();
 
-  for (var container in containers) {
-    var column = (container.child as Padding).child as Row;
-    var expanded = column.children.last as Expanded;
-    var columnInside = expanded.child as Column;
-    var textWidgets = columnInside.children.whereType<Text>().toList();
-
-    containerData.add({
-      "title": textWidgets[0].data ?? "",
-      "description": textWidgets[1].data ?? "",
-      "time": textWidgets[2].data ?? "",
-    });
-  }
-
-  return jsonEncode(containerData); // Convert to JSON string
+  return jsonEncode(serializedData);
 }
-List<Container> deserializeContainers(String jsonString) {
+List<ProgramItem> deserializeProgramItems(String jsonString) {
   List<dynamic> decodedData = jsonDecode(jsonString);
 
   return decodedData.map((data) {
+    return ProgramItem(
+      nadpis: data["title"] ?? "",
+      popis: data["description"] ?? "",
+      time: data["time"] ?? "",
+    );
+  }).toList();
+}
+
+String getMinuteLabel(String text) {
+  int? minutes = int.tryParse(text); // Convert text to int safely
+  if (minutes == 1) {
+    return "minuta";
+  } else if (minutes != null && minutes >= 2 && minutes <= 4) {
+    return "minuty";
+  } else if(minutes != null){
+    return "minut";
+  }else{
+    return "";
+  }
+}
+
+@override
+  void initState() {
+    super.initState();
+    widget.storage.read().then((value) {
+      setState(() {
+        programy = deserializeProgramItems(value);
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.blue,
+          title: const Text('Plánovač schůzek'),
+        ),
+        body: programy.isEmpty
+            ? const Center(child: Text("Žádné programy. Přejdi do režimu úpravy a jeden přidej!"))
+            : ListView.builder(
+  itemCount: programy.length,
+  itemBuilder: (context, index) {
+    final item = programy[index];
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(minHeight: 50),
@@ -94,17 +134,17 @@ List<Container> deserializeContainers(String jsonString) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    data["title"] ?? "",
+                    item.nadpisController.text,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    data["description"] ?? "",
+                    item.popisController.text,
                     softWrap: true,
                     overflow: TextOverflow.visible,
                   ),
                   Text(
-                    "${data["time"] ?? ""} ${getMinuteLabel(data["time"] ?? "")}",
+                    "${item.timeController.text} ${getMinuteLabel(item.timeController.text)}",
                     softWrap: true,
                     overflow: TextOverflow.visible,
                   )
@@ -115,97 +155,34 @@ List<Container> deserializeContainers(String jsonString) {
         ),
       ),
     );
-  }).toList();
-}
-String getMinuteLabel(String text) {
-  int? minutes = int.tryParse(text); // Convert text to int safely
-  if (minutes == 1) {
-    return "minuta";
-  } else if (minutes != null && minutes >= 2 && minutes <= 4) {
-    return "minuty";
-  } else {
-    return "minut";
-  }
-}
-  
-@override
-  void initState() {
-    super.initState();
-    widget.storage.read().then((value) {
-      setState(() {
-        programy = deserializeContainers(value);
-      });
-    });
-  }
+  },
+),
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue,
-          title: const Text('Plánovač schůzek'),
-        ),
-        body: programy.isEmpty
-            ? const Center(child: Text("Žádné programy. Přidej jeden tlačítkem vpravo dole!"))
-            : ReorderableListView(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                children: [ //zobrazení programů
-                  for (int index = 0; index < programy.length; index++)
-                    ListTile(
-                      key: ValueKey(index),
-                      title: programy[index],
-                      leading: ReorderableDragStartListener(
-                        index: index,
-                        child: const Icon(Icons.drag_handle),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          setState(() {
-                            programy.removeAt(index);
-                          });
-                        },
-                      ),
-                    ),
-                ],
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) {
-                      newIndex -= 1;
-                    }
-                    final item = programy.removeAt(oldIndex);
-                    programy.insert(newIndex, item);
-                  });
-                },
-              ),
         floatingActionButton: Stack(
           children: [
             Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.edit),
           onPressed: () async {
             final cont = await Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AddProgramScreen()),
+              MaterialPageRoute(builder: (context) => EditScreen(programyInput: programy,)),
             );
-            if (cont != null && cont is Container) {
+            if (cont != null && cont is List<ProgramItem>) {
               setState(() {
-                programy.add(cont);
+                programy = cont;
               });
             }
           },
         ),
-            ),
+            )/*, save button, pak smazat
             Align(
               alignment: Alignment.bottomCenter,
               child: FloatingActionButton(onPressed: _saveProgramy),
-            )
+            )*/
           ],
         )
-        
       ),
     );
   }
