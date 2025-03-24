@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:schuzky_naplno/pages/programItem.dart';
+import 'package:planovac/pages/programItem.dart';
 
 import 'programScreen.dart';
 
@@ -105,7 +105,7 @@ class _EditScreen extends State<EditScreen> {
           MaterialPageRoute(builder: (context) => AddProgramScreen(program: ProgramItem(nadpis: programy[index].nadpisController.text, popis: programy[index].popisController.text, time: programy[index].timeController.text))),
         );
         if (cont != null && cont is ProgramItem) {
-          setState(() {  programy.removeAt(index); programy.insert(index, cont); });
+          setState(() {  programy.removeAt(index); programy.insert(index, cont);});
         }
     },
 ),
