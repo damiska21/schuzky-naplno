@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:planovac/pages/programItem.dart';
+import 'package:schuzky_naplno/pages/programItem.dart';
 
 class AddProgramScreen extends StatefulWidget {
   final ProgramItem program;

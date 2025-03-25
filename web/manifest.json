@@ -1,6 +1,6 @@
 {
-    "name": "planovac",
-    "short_name": "planovac",
+    "name": "schuzky_naplno",
+    "short_name": "schuzky_naplno",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
