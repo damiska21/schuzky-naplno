@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:schuzky_naplno/pages/programItem.dart';
+import 'package:schuzky_naplno/scripts/programItem.dart';
 
 class AddProgramScreen extends StatefulWidget {
   final ProgramItem program;
@@ -38,7 +38,7 @@ class _AddProgramScreenState extends State<AddProgramScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-          title: const Text('Tvorba programu'),
+          title: const Text('Tvorba / úprava programu'),
       ),
       body:  Column(
          children:  [ //containry na textový pole

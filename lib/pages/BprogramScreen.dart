@@ -1,37 +1,45 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:schuzky_naplno/pages/BprogramScreen.dart';
-import 'package:schuzky_naplno/scripts/storageService.dart';
-import 'pages/BeditScreen.dart';
-import 'package:schuzky_naplno/scripts/programItem.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:schuzky_naplno/pages/BeditScreen.dart';
+import 'package:schuzky_naplno/scripts/programItem.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();//zprovozňuje StorageService
-  await StorageService().init();
-
-  runApp(
-    MaterialApp(
-      home:  MyApp(),
-      routes: <String, WidgetBuilder>{
-        "/edit": (BuildContext context) => const BprogramScreen(),
-      },
-    ),
-  );
+class Storage { //zdroj: https://docs.flutter.dev/cookbook/persistence/reading-writing-files
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/test.txt'); 
+  }
+  Future<String> read() async {
+      final file = await _localFile;
+      final contents = await file.readAsString();
+      return contents;
+  }
+  Future<File> write(String programy) async {
+    final file = await _localFile;
+    return file.writeAsString(programy);
+  }
 }
 
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class BprogramScreen extends StatefulWidget {
+  const BprogramScreen({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<BprogramScreen> createState() => _BprogramScreen();
 }
 
 
-class _MyAppState extends State<MyApp> {
-  List<ProgramItem> plany = [];
+class _BprogramScreen extends State<BprogramScreen> {
+  List<ProgramItem> programy = [];
+
+  Future<File> _saveProgramy() {
+    return widget.storage.write(serializeProgramItems(programy));
+  }
 
 String serializeProgramItems(List<ProgramItem> items) {
   List<Map<String, String>> serializedData = items.map((item) {
@@ -68,31 +76,15 @@ String getMinuteLabel(String text) {
     return "";
   }
 }
-Future<void> loadAllUserJsons() async {
-  final dir = await getApplicationDocumentsDirectory();
-  final jsonDir = Directory('${dir.path}/user_jsons');
-
-  if (!jsonDir.existsSync()) {
-    print('🔍 Žádnej JSON adresář neexistuje ještě');
-    return;
-  }
-
-  final files = jsonDir
-      .listSync(recursive: true)
-      .where((file) => file is File && file.path.endsWith('.json'));
-
-  for (var file in files) {
-    final content = (file as File).readAsStringSync();
-    final json = jsonDecode(content);
-    print('🧾 ${file.path}');
-    print(json);
-    plany.add(deserializeProgramItems(json).first);
-  }
-}
 
 @override
   void initState() {
     super.initState();
+    widget.storage.read().then((value) {
+      setState(() {
+        programy = deserializeProgramItems(value);
+      });
+    });
   }
 
   @override
@@ -104,12 +96,12 @@ Future<void> loadAllUserJsons() async {
           backgroundColor: Colors.blue,
           title: const Text('Plánovač schůzek'),
         ),
-        body: plany.isEmpty
-            ? const Center(child: Text("Žádné programy. Vytvoř třeba schůzku tlačítkem dole!"))
+        body: programy.isEmpty
+            ? const Center(child: Text("Žádné bloky programů. Přejdi do režimu úpravy a jeden přidej!"))
             : ListView.builder(
-  itemCount: plany.length,
+  itemCount: programy.length,
   itemBuilder: (context, index) {
-    final item = plany[index];
+    final item = programy[index];
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(minHeight: 50),
@@ -154,20 +146,27 @@ Future<void> loadAllUserJsons() async {
   },
 ),
 
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add_box_rounded),
+        floatingActionButton: Stack(
+          children: [
+            Align(
+              alignment: Alignment.bottomRight,
+              child: FloatingActionButton(
+          child: const Icon(Icons.edit),
           onPressed: () async {
             final cont = await Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EditScreen(programyInput: plany,)),
+              MaterialPageRoute(builder: (context) => EditScreen(programyInput: programy,)),
             );
             if (cont != null && cont is List<ProgramItem>) {
               setState(() {
-                plany = cont;
+                programy = cont;
               });
             }
           },
         ),
+            )
+          ],
+        )
       ),
     );
   }

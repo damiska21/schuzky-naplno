@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:schuzky_naplno/pages/programItem.dart';
+import 'package:schuzky_naplno/scripts/programItem.dart';
 
-import 'programScreen.dart';
+import 'BprogramEdit.dart';
 
 class EditScreen extends StatefulWidget {
   final List<ProgramItem> programyInput;
@@ -14,6 +14,7 @@ class EditScreen extends StatefulWidget {
 
 class _EditScreen extends State<EditScreen> {
   List<ProgramItem> programy = [];
+
   String getMinuteLabel(String text) {
   int? minutes = int.tryParse(text); // Convert text to int safely
   if (minutes == 1) {
@@ -110,7 +111,7 @@ class _EditScreen extends State<EditScreen> {
     },
 ),
       
-      leading: ReorderableDragStartListener(
+      leading: ReorderableDragStartListener( //ikonky na přešoupání a na delete
         index: index,
         child: const Icon(Icons.drag_handle),
       ),
@@ -155,5 +156,4 @@ class _EditScreen extends State<EditScreen> {
       ),
     );
   }
-  
 }
