@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:schuzky_naplno/pages/program/programEdit.dart';
 import 'package:schuzky_naplno/scripts/programItem.dart';
-
-import 'BprogramEdit.dart';
 
 class EditScreen extends StatefulWidget {
   final List<ProgramItem> programyInput;

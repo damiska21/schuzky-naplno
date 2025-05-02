@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:schuzky_naplno/pages/BprogramScreen.dart';
+import 'package:schuzky_naplno/pages/program/editScreen.dart';
+import 'package:schuzky_naplno/pages/program/programScreen.dart';
 import 'package:schuzky_naplno/scripts/storageService.dart';
-import 'pages/BeditScreen.dart';
 import 'package:schuzky_naplno/scripts/programItem.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -15,7 +15,7 @@ void main() async {
     MaterialApp(
       home:  MyApp(),
       routes: <String, WidgetBuilder>{
-        "/edit": (BuildContext context) => const BprogramScreen(),
+        "/edit": (BuildContext context) => const programScreen(),
       },
     ),
   );

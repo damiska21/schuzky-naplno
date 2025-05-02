@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:schuzky_naplno/pages/BeditScreen.dart';
+import 'package:schuzky_naplno/pages/program/editScreen.dart';
 import 'package:schuzky_naplno/scripts/programItem.dart';
 
 class Storage { //zdroj: https://docs.flutter.dev/cookbook/persistence/reading-writing-files
@@ -26,20 +26,20 @@ class Storage { //zdroj: https://docs.flutter.dev/cookbook/persistence/reading-w
   }
 }
 
-class BprogramScreen extends StatefulWidget {
-  const BprogramScreen({super.key});
+class programScreen extends StatefulWidget {
+  const programScreen({super.key});
 
   @override
-  State<BprogramScreen> createState() => _BprogramScreen();
+  State<programScreen> createState() => _programScreen();
 }
 
 
-class _BprogramScreen extends State<BprogramScreen> {
+class _programScreen extends State<programScreen> {
   List<ProgramItem> programy = [];
 
-  Future<File> _saveProgramy() {
+  /*Future<File> _saveProgramy() {
     return widget.storage.write(serializeProgramItems(programy));
-  }
+  }*/
 
 String serializeProgramItems(List<ProgramItem> items) {
   List<Map<String, String>> serializedData = items.map((item) {
@@ -80,11 +80,11 @@ String getMinuteLabel(String text) {
 @override
   void initState() {
     super.initState();
-    widget.storage.read().then((value) {
+    /*widget.storage.read().then((value) {
       setState(() {
         programy = deserializeProgramItems(value);
       });
-    });
+    });*/
   }
 
   @override
