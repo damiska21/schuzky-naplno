@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:schuzky_naplno/pages/program/editScreen.dart';
+import 'package:schuzky_naplno/pages/program/planSettings.dart';
 import 'package:schuzky_naplno/scripts/programItem.dart';
 
 class Storage { //zdroj: https://docs.flutter.dev/cookbook/persistence/reading-writing-files
@@ -26,15 +27,15 @@ class Storage { //zdroj: https://docs.flutter.dev/cookbook/persistence/reading-w
   }
 }
 
-class programScreen extends StatefulWidget {
-  const programScreen({super.key});
+class planScreen extends StatefulWidget {
+  const planScreen({super.key});
 
   @override
-  State<programScreen> createState() => _programScreen();
+  State<planScreen> createState() => _planScreen();
 }
 
 
-class _programScreen extends State<programScreen> {
+class _planScreen extends State<planScreen> {
   List<ProgramItem> programy = [];
 
   /*Future<File> _saveProgramy() {
@@ -93,8 +94,25 @@ String getMinuteLabel(String text) {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
           backgroundColor: Colors.blue,
-          title: const Text('Plánovač schůzek'),
+          title: const Text('Plánovač - planScreen'), //schůzekr
+          actions: [
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+        // otevři nastavení nebo jinou stránku
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => planSettings()),
+                );
+              },
+            ),
+          ],
         ),
         body: programy.isEmpty
             ? const Center(child: Text("Žádné bloky programů. Přejdi do režimu úpravy a jeden přidej!"))

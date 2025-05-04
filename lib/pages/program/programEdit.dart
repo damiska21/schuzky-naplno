@@ -38,7 +38,7 @@ class _AddProgramScreenState extends State<AddProgramScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-          title: const Text('Tvorba / úprava programu'),
+          title: const Text('Tvorba / úprava programu - programEdit'),
       ),
       body:  Column(
          children:  [ //containry na textový pole

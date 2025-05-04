@@ -39,7 +39,7 @@ class _EditScreen extends State<EditScreen> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.blue,
-          title: const Text('Plánovač schůzek'),
+          title: const Text('Plánovač schůzek - editScreen'),
         ),
         body: programy.isEmpty
             ? const Center(child: Text("Žádné programy. Přidej jeden tlačítkem vpravo dole!"))

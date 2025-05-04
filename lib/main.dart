@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:schuzky_naplno/pages/program/editScreen.dart';
-import 'package:schuzky_naplno/pages/program/programScreen.dart';
+import 'package:schuzky_naplno/pages/program/planScreen.dart';
 import 'package:schuzky_naplno/scripts/storageService.dart';
 import 'package:schuzky_naplno/scripts/programItem.dart';
 import 'package:path_provider/path_provider.dart';
 
+/*terminologie 
+program - jeden kus, jedna aktivita
+plán - několik programů u sebe, např. na celý den
+*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();//zprovozňuje StorageService
   await StorageService().init();
@@ -15,7 +18,7 @@ void main() async {
     MaterialApp(
       home:  MyApp(),
       routes: <String, WidgetBuilder>{
-        "/edit": (BuildContext context) => const programScreen(),
+        "/edit": (BuildContext context) => const planScreen(),
       },
     ),
   );
@@ -102,7 +105,7 @@ Future<void> loadAllUserJsons() async {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.blue,
-          title: const Text('Plánovač schůzek'),
+          title: const Text('Plánovač schůzek - main'),
         ),
         body: plany.isEmpty
             ? const Center(child: Text("Žádné programy. Vytvoř třeba schůzku tlačítkem dole!"))
@@ -159,7 +162,7 @@ Future<void> loadAllUserJsons() async {
           onPressed: () async {
             final cont = await Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EditScreen(programyInput: plany,)),
+              MaterialPageRoute(builder: (context) => planScreen()),
             );
             if (cont != null && cont is List<ProgramItem>) {
               setState(() {
