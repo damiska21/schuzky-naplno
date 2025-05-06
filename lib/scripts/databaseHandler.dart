@@ -94,6 +94,34 @@ class DatabaseHandler {
     return planId;
   }
 
+  Future<List<ProgramItem>> getProgramItemsForPlan(int planId) async {
+    final db = await database;
+
+    final result = await db.rawQuery('''
+      SELECT program_items.*
+      FROM program_items
+      JOIN plan_items ON program_items.id = plan_items.program_item_id
+      WHERE plan_items.plan_id = ?
+    ''', [planId]);
+
+    return result.map((data) => ProgramItem(
+        nadpis: data['title'].toString(),
+        popis: data['description'].toString(),
+        time: data['time'].toString(),
+    )).toList();
+  }
+  
+  Future<int> updatePlanName(int planId, String newName) async {
+  final db = await database;
+
+  return await db.update(
+    'plans',
+    {'name': newName},
+    where: 'id = ?',
+    whereArgs: [planId],
+  );
+}
+
   Future<Map<String, List<ProgramItem>>> getAllPlansWithItems() async {
     final db = await database;
 

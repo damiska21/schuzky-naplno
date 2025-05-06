@@ -1,69 +1,22 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:schuzky_naplno/pages/program/editScreen.dart';
 import 'package:schuzky_naplno/pages/program/planSettings.dart';
 import 'package:schuzky_naplno/scripts/programItem.dart';
+import 'package:schuzky_naplno/scripts/databaseHandler.dart';
 
-class Storage { //zdroj: https://docs.flutter.dev/cookbook/persistence/reading-writing-files
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/test.txt'); 
-  }
-  Future<String> read() async {
-      final file = await _localFile;
-      final contents = await file.readAsString();
-      return contents;
-  }
-  Future<File> write(String programy) async {
-    final file = await _localFile;
-    return file.writeAsString(programy);
-  }
-}
 
 class planScreen extends StatefulWidget {
-  const planScreen({super.key});
+  final int planId; //pokud je to -1, znamená, že to je fresh a je nutné vytvořit záznam
+  const planScreen({super.key, required this.planId});
 
   @override
   State<planScreen> createState() => _planScreen();
 }
 
-
 class _planScreen extends State<planScreen> {
   List<ProgramItem> programy = [];
-
-  /*Future<File> _saveProgramy() {
-    return widget.storage.write(serializeProgramItems(programy));
-  }*/
-
-String serializeProgramItems(List<ProgramItem> items) {
-  List<Map<String, String>> serializedData = items.map((item) {
-    return {
-      "title": item.nadpisController.text,
-      "description": item.popisController.text,
-      "time": item.timeController.text,
-    };
-  }).toList();
-
-  return jsonEncode(serializedData);
-}
-List<ProgramItem> deserializeProgramItems(String jsonString) {
-  List<dynamic> decodedData = jsonDecode(jsonString);
-
-  return decodedData.map((data) {
-    return ProgramItem(
-      nadpis: data["title"] ?? "",
-      popis: data["description"] ?? "",
-      time: data["time"] ?? "",
-    );
-  }).toList();
-}
+  String nazev = "";
+  int planId = -2;
 
 String getMinuteLabel(String text) {
   int? minutes = int.tryParse(text); // Convert text to int safely
@@ -81,13 +34,24 @@ String getMinuteLabel(String text) {
 @override
   void initState() {
     super.initState();
-    /*widget.storage.read().then((value) {
-      setState(() {
-        programy = deserializeProgramItems(value);
-      });
-    });*/
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      programyInitialize();
+    });
   }
 
+  void programyInitialize()async{
+  //buďto vytvoří nový záznam plánu, nebo loadne starý záznam plánu
+    planId = widget.planId;
+    if (planId == -1) {
+      nazev = await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => planSettings()),
+                );
+      planId = await DatabaseHandler.instance.createPlan(nazev, []);
+    }else{
+      programy = await DatabaseHandler.instance.getProgramItemsForPlan(planId);
+      setState(() {});
+    }
+}
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -101,15 +65,16 @@ String getMinuteLabel(String text) {
             },
           ),
           backgroundColor: Colors.blue,
-          title: const Text('Plánovač - planScreen'), //schůzekr
+          title: const Text('Plánovač - planScreen'),
           actions: [
             IconButton(
               icon: Icon(Icons.settings),
-              onPressed: () {
-        // otevři nastavení nebo jinou stránku
-                Navigator.of(context).push(
+              onPressed: () async {
+                final nazevChange = await Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => planSettings()),
                 );
+                if (nazevChange != null && nazevChange is String) {
+          setState(() async { nazev = nazevChange; await DatabaseHandler.instance.updatePlanName(planId, nazev); });}
               },
             ),
           ],
@@ -173,7 +138,7 @@ String getMinuteLabel(String text) {
           onPressed: () async {
             final cont = await Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EditScreen(programyInput: programy,)),
+              MaterialPageRoute(builder: (context) => EditScreen(programyInput: programy, planId: planId,)),
             );
             if (cont != null && cont is List<ProgramItem>) {
               setState(() {

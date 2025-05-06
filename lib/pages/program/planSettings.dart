@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class planSettings extends StatefulWidget {
   const planSettings({super.key});
@@ -38,17 +37,15 @@ class _planSettingsState extends State<planSettings> {
               autofocus: true,
               controller: nadpisController,
               decoration:  const InputDecoration(
-                hintText: 'Běhačka v parku',
-                helperText: 'Název Programu',
+                hintText: 'Schůzka pondělí',
+                helperText: 'Název plánu',
                 border: OutlineInputBorder(),),),
            ),
            ElevatedButton(onPressed: () =>{
-            Navigator.pop(context)}, 
+            Navigator.pop(context, nadpisController.text)}, 
             child: Container(
              margin: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
-             decoration: const BoxDecoration(
-               color:  Color.fromARGB(255, 0, 0, 0),
-             ),
+             
              child: const Text('Uložit'),
            ))
         ],

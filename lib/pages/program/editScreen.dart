@@ -3,9 +3,10 @@ import 'package:schuzky_naplno/pages/program/programEdit.dart';
 import 'package:schuzky_naplno/scripts/programItem.dart';
 
 class EditScreen extends StatefulWidget {
+  final int planId;
   final List<ProgramItem> programyInput;
 
-  const EditScreen({super.key, required this.programyInput});
+  const EditScreen({super.key, required this.programyInput, required this.planId});
 
   @override
   State<EditScreen> createState() => _EditScreen();
@@ -26,6 +27,7 @@ class _EditScreen extends State<EditScreen> {
     return "";
   }
 }
+
   @override
   void initState() {
     super.initState();

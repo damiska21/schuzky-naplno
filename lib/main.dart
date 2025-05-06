@@ -18,7 +18,7 @@ void main() async {
     MaterialApp(
       home:  MyApp(),
       routes: <String, WidgetBuilder>{
-        "/edit": (BuildContext context) => const planScreen(),
+        "/edit": (BuildContext context) => const planScreen(planId: -1,),
       },
     ),
   );
@@ -162,7 +162,7 @@ Future<void> loadAllUserJsons() async {
           onPressed: () async {
             final cont = await Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => planScreen()),
+              MaterialPageRoute(builder: (context) => planScreen(planId: -1,)),
             );
             if (cont != null && cont is List<ProgramItem>) {
               setState(() {
