@@ -15,7 +15,7 @@ class planScreen extends StatefulWidget {
 
 class _planScreen extends State<planScreen> {
   List<ProgramItem> programy = [];
-  String nazev = "";
+  String nazev = "Schůzka bez názvu";
   int planId = -2;
 
 String getMinuteLabel(String text) {
@@ -43,10 +43,13 @@ String getMinuteLabel(String text) {
   //buďto vytvoří nový záznam plánu, nebo loadne starý záznam plánu
     planId = widget.planId;
     if (planId == -1) {
-      nazev = await Navigator.of(context).push(
+      final test = await Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => planSettings()),
                 );
-      planId = await DatabaseHandler.instance.createPlan(nazev, []);
+      if (test != null && test is String) {
+        nazev = test;
+      }
+    planId = await DatabaseHandler.instance.createPlan(nazev, []);
     }else{
       programy = await DatabaseHandler.instance.getProgramItemsForPlan(planId);
       setState(() {});
@@ -65,7 +68,7 @@ String getMinuteLabel(String text) {
             },
           ),
           backgroundColor: Colors.blue,
-          title: const Text('Plánovač - planScreen'),
+          title: const Text("Plánovač - planScreen"),
           actions: [
             IconButton(
               icon: Icon(Icons.settings),
@@ -144,6 +147,7 @@ String getMinuteLabel(String text) {
               setState(() {
                 programy = cont;
               });
+              programy = await DatabaseHandler.instance.upsertProgramItemsWithIdSync(planId, programy);
             }
           },
         ),
